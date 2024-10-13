@@ -1,17 +1,19 @@
 <template>
-  <div class="container py-5">
-    <h1 class="text-center mb-4">Gym Leaderboard</h1>
-    <button @click="fetchAllLeaderboards" class="btn btn-primary mb-4">Fetch All Leaderboards</button>
-    <div v-if="loading" class="text-center mb-4">
-      Loading...
+  <div class="container py-5 text-center">
+    <!-- Logo with alternating background -->
+    <div :class="['logo-wrapper', { 'with-background': logoHasBackground }]" class="mb-4">
+      <img src="@/assets/ttk_logo.svg" alt="Gym Logo" class="logo mb-3" />
+      <h1 class="text-center mb-2 title">Jõusaali edetabel</h1>
     </div>
+
+    <div v-if="loading" class="text-center mb-4">Loading...</div>
     <div v-else class="row g-4">
       <ExerciseCard
-          v-for="(exercise, index) in exercises"
-          :key="index"
+          v-for="(exercise) in visibleExercises"
+          :key="exercise.name"
           :title="exercise.name"
           :entries="formatEntries(exercise.name)"
-          :hasBackground="index % 1 === 0"
+          :hasBackground="false"
       />
     </div>
   </div>
@@ -19,72 +21,78 @@
 
 <script>
 import ExerciseCard from './ExerciseCard.vue';
-import { useGymLeaderboardStore } from '@/stores/useGymLeaderboardStore'; // Import the Pinia store
-import { computed } from 'vue';
+import { useGymLeaderboardStore } from '@/stores/useGymLeaderboardStore';
+import { computed, onMounted, ref } from 'vue';
 
 export default {
   name: 'GymLeaderboard',
-  components: {
-    ExerciseCard
-  },
+  components: { ExerciseCard },
   setup() {
     const gymLeaderboardStore = useGymLeaderboardStore();
 
-    // Array of exercise names representing different Google Sheet tabs
-    const exercises = [
-      { name: 'TOP Rinnalt surumine MAX (Mehed)' },
-      { name: 'TOP Rinnalt surumine MAX (Naised)' },
-      { name: 'Cooperi-test (Mehed)' },
-      { name: 'Cooperi-test (Naised)' },
-      { name: 'TOP Rinnalt surumine 50kg (Mehed)' },
-      { name: 'TOP Rinnalt surumine 50kg (Naised)' },
-      { name: 'TOP Kükk (Mehed)' },
-      { name: 'TOP Kükk (Naised)'},
-    ];
-
-    // Computed property for loading state
+    // Access the exercises directly from the store
+    const exercises = computed(() => gymLeaderboardStore.exercises);
     const loading = computed(() => gymLeaderboardStore.loading);
 
-    // Function to get formatted entries for each exercise
+    // Current index to track which pair of exercises is visible
+    const currentIndex = ref(0);
+    const visibleExercises = ref([]);
+    const logoHasBackground = computed(() => currentIndex.value % 2 === 0);
+
+    // Function to update the visible exercises (two at a time)
+    const updateVisibleExercises = () => {
+      visibleExercises.value = exercises.value.slice(currentIndex.value, currentIndex.value + 2);
+      currentIndex.value = (currentIndex.value + 2) % exercises.value.length; // Loop back to the start
+    };
+
     const formatEntries = (sheetName) => {
       if (gymLeaderboardStore.leaderboardData[sheetName]) {
-        return gymLeaderboardStore.leaderboardData[sheetName].map((row) => {
-          return {
-            name: row[10] || 'Unknown', // Extracting participant's name from the first index
-            score: row[3] || 'N/A', // Extracting score from the fourth index (or change the index based on your data structure)
-            result_date: row[4] || 'N/A' // Extracting score from the fourth index (or change the index based on your data structure)
-          };
-        });
+        return gymLeaderboardStore.leaderboardData[sheetName].map((row) => ({
+          name: row[10] || 'Unknown',
+          score: row[3] || 'N/A',
+          result_date: row[4] || 'N/A',
+        }));
       }
       return [];
     };
 
-    // Method to fetch data for all exercises
-    const fetchAllLeaderboards = async () => {
-      for (const exercise of exercises) {
-        // Set the sheet name for each exercise
-        gymLeaderboardStore.setSheet(exercise.name);
-        // Fetch the leaderboard data for this sheet
-        await gymLeaderboardStore.fetchLeaderboardData();
-      }
-    };
+    onMounted(() => {
+      gymLeaderboardStore.startAutoRefetch(120000); // Start auto refetch every 120 seconds
 
-    return {
-      fetchAllLeaderboards,
-      loading,
-      exercises,
-      formatEntries
-    };
-  }
+      // Show the first two exercises initially
+      updateVisibleExercises();
+
+      // Change the visible exercises every 10 seconds
+      setInterval(updateVisibleExercises, 10000);
+    });
+
+    return { loading, visibleExercises, formatEntries, logoHasBackground };
+  },
 };
 </script>
 
 <style scoped>
-h1 {
-  font-family: 'DIN', Roboto, sans-serif;
-  font-size: 2.5rem;
-  text-transform: uppercase;
-  color: white !important;
-  letter-spacing: 2px;
+.title {
+  color: white; /* Set the title text color to white */
+}
+
+/* Logo styling */
+.logo {
+  max-width: 250px; /* Adjust size of the logo */
+  height: auto;
+  display: block;
+  margin: 0 auto; /* Center the logo */
+}
+
+/* Wrapper for the logo to alternate background */
+.logo-wrapper {
+  padding: 20px;
+  border-radius: 3px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Same background style as exercise card */
+.with-background {
+  background-color: rgba(255, 255, 255, 0.1); /* 10% transparent white background */
 }
 </style>

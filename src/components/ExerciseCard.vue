@@ -180,6 +180,25 @@ export default {
   color: white;
 }
 
+.player-name.first-place {
+  font-size: 1.6rem;
+  color: gold;
+}
+
+.player-name.second-place {
+  font-size: 1.5rem;
+  color: silver;
+}
+
+.player-name.third-place {
+  font-size: 1.4rem;
+  color: #cd7f32;
+}
+
+.player-name.regular-place {
+  font-size: 1.2rem;
+}
+
 .player-score {
   font-size: 1.2rem;
   font-weight: bold;
