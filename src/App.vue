@@ -22,12 +22,10 @@ html, body {
   height: 100%; /* Ensure the body and html take full height */
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   background-size: cover; /* Ensures the gradient covers the entire background */
-  background-attachment: fixed; /* Fixes the background in place while scrolling */
-  background-repeat: no-repeat;
-  background-position: center;
-  overflow-x: hidden; /* Prevents horizontal scroll */
+  /* Fixes the background in place while scrolling */
+  background: linear-gradient(135deg, #5fa980, #134329) no-repeat fixed center;
+  overflow: hidden; /* Disable scrolling */
 }
 
 .container {
@@ -36,7 +34,7 @@ html, body {
 
 
 body {
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  background: linear-gradient(135deg, #134329, #5fa980) no-repeat fixed center;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   color: white;
   font-smoothing: antialiased;
@@ -82,4 +80,14 @@ h1, h5 {
 hr {
   border-color: #444;
 }
+
+* {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+
 </style>

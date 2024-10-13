@@ -89,7 +89,7 @@ export const useGymLeaderboardStore = defineStore({
 		},
 
 		// Start the periodic refetching
-		startAutoRefetch(interval = 1200000) {
+		startAutoRefetch(interval = 3000000) {
 			this.fetchAllLeaderboardData(); // Initial fetch
 
 			// Set up the refetch interval

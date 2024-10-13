@@ -12,6 +12,13 @@ module.exports = defineConfig({
       })
     ]
   },
+  pages: {
+    index: {
+      // entry for the page
+      entry: 'src/main.js',
+      title: 'TTK Jõusaali edetabel',
+    },
+  },
   publicPath: process.env.NODE_ENV === 'production'
     ? '/gym-leaderboard/'
     : '/'

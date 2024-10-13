@@ -6,7 +6,7 @@
       <h1 class="text-center mb-2 title">Jõusaali edetabel</h1>
     </div>
 
-    <div v-if="loading" class="text-center mb-4">Loading...</div>
+    <div v-if="loading" class="text-center mb-4 text-white">Laeb, oota natsa, musi..</div>
     <div v-else class="row g-4">
       <ExerciseCard
           v-for="(exercise) in visibleExercises"
@@ -57,13 +57,13 @@ export default {
     };
 
     onMounted(() => {
-      gymLeaderboardStore.startAutoRefetch(120000); // Start auto refetch every 120 seconds
+      gymLeaderboardStore.startAutoRefetch(300000); // Start auto refetch every 120 seconds
 
       // Show the first two exercises initially
       updateVisibleExercises();
 
       // Change the visible exercises every 10 seconds
-      setInterval(updateVisibleExercises, 10000);
+      setInterval(updateVisibleExercises, 13000);
     });
 
     return { loading, visibleExercises, formatEntries, logoHasBackground };
